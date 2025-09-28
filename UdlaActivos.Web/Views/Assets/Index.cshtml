@@ -1,0 +1,135 @@
+﻿@model UdlaActivos.Web.Controllers.AssetsPageVm
+@{
+    ViewData["Title"] = "Activos";
+    var httpReq = ViewContext.HttpContext.Request;
+    Func<string, int?, string> link = (state, goPage) =>
+        Url.Action("Index", new { state, q = Model.Query, page = goPage ?? 1, pageSize = Model.PageSize })!;
+    int totalPages = Math.Max(1, (int)Math.Ceiling((double)Model.Total / Model.PageSize));
+}
+
+<style>
+    .segmented {
+        display: inline-flex;
+        gap: 0;
+        background: #f1f3f5;
+        border: 1px solid #e6e8eb;
+        border-radius: 9999px;
+        padding: 4px
+    }
+
+        .segmented .seg {
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 6px 14px;
+            line-height: 1;
+            border-radius: 9999px;
+            color: #2b2f33;
+            text-decoration: none;
+            transition: .15s
+        }
+
+            .segmented .seg:hover {
+                background: #e9ecef
+            }
+
+            .segmented .seg.active {
+                background: #fff;
+                color: #111;
+                border-color: #e5e7eb;
+                border-radius: 10px;
+                box-shadow: 0 1px 2px rgba(0,0,0,.04)
+            }
+
+</style>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+
+        <!-- Búsqueda + Acciones -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <form class="d-flex gap-2" method="get" asp-action="Index">
+                <input type="search"
+                       class="form-control search-input"
+                       name="q"
+                       value="@Model.Query"
+                       placeholder="Buscar activos..."
+                       aria-label="Buscar activos" />
+
+            </form>
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-secondary" href="#">⭳ Exportar</a>
+                <a class="btn btn-dark" href="#">＋ Nuevo Activo</a>
+            </div>
+        </div>
+
+        <!-- Tabs unidos -->
+        <div class="mb-3">
+            <nav class="segmented" aria-label="Filtro por estado">
+                <a class="seg @(Model.State == "Todos" ? "active" : "")" href="@link("Todos", null)">Todos</a>
+                <a class="seg @(Model.State == "Asignados" ? "active" : "")" href="@link("Asignados", null)">Asignados</a>
+                <a class="seg @(Model.State == "Disponibles" ? "active" : "")" href="@link("Disponibles", null)">Disponibles</a>
+                <a class="seg @(Model.State == "En Mantenimiento" ? "active" : "")" href="@link("En Mantenimiento", null)">En Mantenimiento</a>
+            </nav>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Marca / Modelo</th>
+                        <th scope="col">Serie</th>
+                        <th scope="col">Responsable</th>
+                        <th scope="col">Ubicación</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col" class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Count > 0)
+                    {
+                        foreach (var a in Model.Items)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@a.Code</td>
+                                <td>@a.Type</td>
+                                <td>@a.BrandModel</td>
+                                <td>@a.Serial</td>
+                                <td>@a.Responsible</td>
+                                <td>@a.Site</td>
+                                <td>
+                                    <span class="badge border rounded-pill">
+                                        @((a.Status == "Mantenimiento") ? "En mantenimiento" : a.Status)
+                                    </span>
+                                </td>
+                                <td class="text-end"><a href="#" class="link-dark">Ver</a></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">No hay activos para mostrar.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación simple -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted small">
+                Mostrando @Model.Items.Count de @Model.Total activos
+            </div>
+            <div class="btn-group">
+                <a class="btn btn-outline-secondary @(Model.Page <= 1 ? "disabled" : "")"
+                   href="@(Model.Page <= 1 ? "#" : link(Model.State, Model.Page - 1))">Anterior</a>
+                <a class="btn btn-outline-secondary @(Model.Page >= totalPages ? "disabled" : "")"
+                   href="@(Model.Page >= totalPages ? "#" : link(Model.State, Model.Page + 1))">Siguiente</a>
+            </div>
+        </div>
+
+    </div>
+</div>
