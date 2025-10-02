@@ -1,0 +1,111 @@
+﻿@model UdlaActivos.Web.Models.AssetCreateVm
+@{
+    ViewData["Title"] = "Nuevo Activo";
+}
+
+<style>
+    .form-card {
+        border-radius: 12px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: .95rem;
+        color: #374151;
+    }
+
+    .help-text {
+        color: #9aa0a6;
+        font-size: .9rem;
+    }
+</style>
+
+<!-- Encabezado con regreso -->
+
+<div class="card border-0 shadow-sm form-card">
+    <div class="card-body">
+        <h6 class="mb-1">Información del Activo</h6>
+        <div class="help-text mb-3">Ingrese los datos del nuevo activo tecnológico</div>
+
+        <form asp-action="New" method="post" novalidate>
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <!-- Columna izquierda -->
+                <div class="col-md-6">
+                    <label asp-for="Type" class="form-label"></label>
+                    <select asp-for="Type" class="form-select" asp-items="ViewBag.Types">
+                        <option value="">Seleccione un tipo</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Status" class="form-label"></label>
+                    <select asp-for="Status" class="form-select" asp-items="ViewBag.Statuses"></select>
+                    <span asp-validation-for="Status" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Brand" class="form-label"></label>
+                    <input asp-for="Brand" class="form-control" placeholder="Ej: Dell, HP, Apple..." />
+                    <span asp-validation-for="Brand" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Model" class="form-label"></label>
+                    <input asp-for="Model" class="form-control" placeholder="Ej: Optiplex 7090, EliteDesk 800 G6..." />
+                    <span asp-validation-for="Model" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Serial" class="form-label"></label>
+                    <input asp-for="Serial" class="form-control" placeholder="Número de serie del fabricante" />
+                    <span asp-validation-for="Serial" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="UdlaCode" class="form-label"></label>
+                    <input asp-for="UdlaCode" class="form-control" placeholder="Código interno de la universidad" />
+                    <span asp-validation-for="UdlaCode" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="PurchaseDate" class="form-label"></label>
+                    <input asp-for="PurchaseDate" type="date" class="form-control" />
+                    <span asp-validation-for="PurchaseDate" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Site" class="form-label"></label>
+                    <select asp-for="Site" class="form-select" asp-items="ViewBag.Sites">
+                        <option value="">Seleccione una sede</option>
+                    </select>
+                    <span asp-validation-for="Site" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"
+                              placeholder="Descripción detallada del activo (especificaciones, características, etc.)"></textarea>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Notes" class="form-label"></label>
+                    <textarea asp-for="Notes" class="form-control" rows="2"
+                              placeholder="Observaciones adicionales sobre el estado o condiciones del activo"></textarea>
+                </div>
+
+                <div class="col-12 d-flex justify-content-between mt-2">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-dark">
+                        🗂️ Guardar Activo
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,168 @@
+﻿@model UdlaActivos.Web.Models.AssetDetailVm
+@{
+    ViewData["Title"] = "Detalle de Activo";
+    string StatusText(string s) => s == "Mantenimiento" ? "En mantenimiento" : s;
+}
+
+<style>
+    .card-soft {
+        border: 0;
+        box-shadow: 0 1px 2px rgba(0,0,0,.06)
+    }
+
+    .label {
+        font-size: .82rem;
+        color: #6b7280
+    }
+
+    .value {
+        font-weight: 500
+    }
+
+    .vsep {
+        border-top: 1px solid #eee
+    }
+
+    /* Grid fluido para “Información general” que se adapta con wrap */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 12px 24px;
+    }
+    @@media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        /* wrap a 1 columna en móvil */
+    }
+
+    /* Contenedor de acciones con wrap en pantallas pequeñas */
+    .actions-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+        .actions-wrap > * {
+            flex: 0 0 auto;
+        }
+</style>
+
+<!-- Encabezado: wrap en móvil -->
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div class="me-2">
+        <h5 class="mb-0">@Model.Code</h5>
+        <div class="text-muted">@Model.Title</div>
+    </div>
+    <div class="actions-wrap">
+        <a class="btn btn-outline-secondary" href="#">⇄ Transferir</a>
+        <a class="btn btn-outline-secondary" href="#">✎ Editar</a>
+        <a class="btn btn-danger" href="#">⬇ Dar de Baja</a>
+    </div>
+</div>
+
+<!-- Columnas que se apilan en móvil: col-12 en xs, 8/4 en lg -->
+<div class="row g-3">
+    <!-- Información General -->
+    <div class="col-12 col-lg-8">
+        <div class="card card-soft">
+            <div class="card-body">
+                <h6 class="mb-3">Información General</h6>
+
+                <div class="info-grid">
+                    <div>
+                        <div class="label">Tipo</div>
+                        <div class="value">@Model.Type</div>
+                    </div>
+                    <div>
+                        <div class="label">Estado</div>
+                        <span class="badge text-bg-dark rounded-pill">@StatusText(Model.Status)</span>
+                    </div>
+
+                    <div>
+                        <div class="label">Marca</div>
+                        <div class="value">@Model.Brand</div>
+                    </div>
+                    <div>
+                        <div class="label">Modelo</div>
+                        <div class="value">@Model.Model</div>
+                    </div>
+
+                    <div>
+                        <div class="label">Número de Serie</div>
+                        <div class="value">@Model.Serial</div>
+                    </div>
+                    <div>
+                        <div class="label">Fecha de Adquisición</div>
+                        <div class="value">@Model.PurchaseDate?.ToString("yyyy-MM-dd")</div>
+                    </div>
+                </div>
+
+                <div class="vsep mt-3 pt-3">
+                    <div class="label mb-1">Descripción</div>
+                    <div>@Model.Description</div>
+                </div>
+
+                <div class="mt-3">
+                    <div class="label mb-1">Observaciones</div>
+                    <div>@Model.Notes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asignación -->
+    <div class="col-12 col-lg-4">
+        <div class="card card-soft h-100">
+            <div class="card-body">
+                <h6 class="mb-3">Asignación</h6>
+
+                <div class="mb-2">
+                    <div class="label">Responsable</div>
+                    <div class="value">@Model.AssignedTo</div>
+                    <div class="text-muted" style="font-size:.9rem">@Model.AssignedRole</div>
+                </div>
+
+                <div class="mb-2">
+                    <div class="label">Ubicación</div>
+                    <div class="value">@Model.Site</div>
+                </div>
+
+                <div class="mb-2">
+                    <div class="label">Fecha de Asignación</div>
+                    <div class="value">@Model.AssignedAt?.ToString("yyyy-MM-dd")</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="label">Último Mantenimiento</div>
+                    <div class="value">@Model.LastMaintenance?.ToString("yyyy-MM-dd")</div>
+                </div>
+
+                <a class="btn btn-outline-secondary w-100" href="@Model.DeliveryDocUrl">📄 Ver Acta de Entrega</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial (items con wrap y stack en móvil) -->
+    <div class="col-12">
+        <div class="card card-soft">
+            <div class="card-body">
+                <h6 class="mb-1">Historial</h6>
+                <div class="text-muted mb-3" style="font-size:.9rem">Registro de movimientos y mantenimientos</div>
+
+                @foreach (var h in Model.History.OrderByDescending(x => x.Date))
+                {
+                    <div class="vsep py-2">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <span class="badge bg-secondary-subtle text-secondary border rounded-pill">@h.Kind</span>
+                            <span class="text-muted">@h.Date:yyyy-MM-dd</span>
+                            <div class="flex-fill">@h.Title</div>
+                            <span class="text-muted">Por: @h.By</span>
+                            <span class="text-muted">@h.Ref</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

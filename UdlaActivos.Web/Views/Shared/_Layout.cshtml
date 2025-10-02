@@ -10,11 +10,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@title</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <!-- Fuente Inter -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
     <style>
         :root {
             --sidebar-w: 260px;
-            --topbar-h: 64x;
+            --topbar-h: 64px;
             --space: 16px;
+            --card-border: #eaecef;
+            --row-border: #eef0f2;
+            --hover: #f7f8fa;
+            --thead-bg: #fbfbfc;
         }
 
         /* Base */
@@ -30,6 +39,7 @@
             margin: 0;
             background: #f7f7f9;
             color: #111;
+            ont-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
         }
 
         /* Sidebar */
@@ -107,40 +117,64 @@
             border: 1px solid #e6e8eb;
             border-radius: 12px;
             height: 42px;
-            padding-left: 38px; /* espacio para el icono */
+            padding-left: 38px;
             box-shadow: 0 1px 2px rgba(0,0,0,.03) inset;
             background-repeat: no-repeat;
             background-position: 12px 50%;
             background-size: 18px 18px;
-            /* SVG magnifying glass embebido (color gris #9aa0a6) */
-            background-image: url(<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa0a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21L16.7 16.7'/%3E%3C/svg%3E");
         }
 
-            .search-input::placeholder {
-                color: #9aa0a6;
-            }
 
-            .search-input:focus {
-                outline: 0;
-                border-color: #cfd4d9;
-                box-shadow: 0 0 0 3px rgba(17,17,17,.06);
-            }
+        .search-input::placeholder {
+            color: #9aa0a6;
+        }
+
+        .search-input:focus {
+            outline: 0;
+            border-color: #cfd4d9;
+            box-shadow: 0 0 0 3px rgba(17,17,17,.06);
+        }
 
     </style>
 </head>
+
+
 <body>
     <!-- Sidebar -->
     <aside class="sidebar">
-        <div class="brand">🛠️ UDLA Activos</div>
+        <div class="brand"> 
+            <a href="#" class="border rounded-2 p-1 m-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-boxes h-5 w-5"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"></path><path d="m7 16.5-4.74-2.85"></path><path d="m7 16.5 5-3"></path><path d="M7 16.5v5.17"></path><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"></path><path d="m17 16.5-5-3"></path><path d="m17 16.5 4.74-2.85"></path><path d="M17 16.5v5.17"></path><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"></path><path d="M12 8 7.26 5.15"></path><path d="m12 8 4.74-2.85"></path><path d="M12 13.5V8"></path></svg>
+            </a>
+            
+            UDLA Activos</div>
         <nav class="p-3 d-grid gap-2">
-            <div class="muted mb-1">General</div>
-            <a class="nav-link @(ctrl == "Dashboard" ? "active" : "")" asp-controller="Dashboard" asp-action="Index">📊 Dashboard</a>
-            <a class="nav-link @(ctrl == "Assets" ? "active" : "")" asp-controller="Assets" asp-action="Index">💻 Activos</a>
-            <a class="nav-link disabled">🧰 Mantenimientos</a>
-            <a class="nav-link disabled">📄 Actas</a>
-            <a class="nav-link disabled">🔁 Sincronización SAP</a>
-            <div class="muted mt-3 mb-1">Administración</div>
-            <a class="nav-link disabled">👥 Usuarios</a>
+            <div class="muted mb-1">
+                <b>General</b>
+            </div>
+            <a class="nav-link @(ctrl == "Dashboard" ? "active" : "")" asp-controller="Dashboard" asp-action="Index">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard h-4 w-4"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
+                Dashboard</a>
+            <a class="nav-link @(ctrl == "Assets" ? "active" : "")" asp-controller="Assets" asp-action="Index">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-computer h-4 w-4"><rect width="14" height="8" x="5" y="2" rx="2"></rect><rect width="20" height="8" x="2" y="14" rx="2"></rect><path d="M6 18h2"></path><path d="M12 18h6"></path></svg>
+                Activos</a>
+            <a class="nav-link disabled">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings h-4 w-4"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+
+                Mantenimientos</a>
+            <a class="nav-link disabled">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text h-4 w-4"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+                Actas</a>
+            <a class="nav-link disabled">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-from-line h-4 w-4"><path d="m18 9-6-6-6 6"></path><path d="M12 3v14"></path><path d="M5 21h14"></path></svg>
+                Sincronización SAP</a>
+            <div class="muted mt-3 mb-1"> 
+                <b>Administración</b>
+            </div>
+            <a class="nav-link disabled">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users h-4 w-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                Usuarios</a>
             <a class="nav-link disabled">⚙️ Configuración</a>
         </nav>
     </aside>
@@ -154,5 +188,6 @@
     <main class="content page">
         @RenderBody()
     </main>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

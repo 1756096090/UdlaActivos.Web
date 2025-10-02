@@ -1,77 +1,98 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using UdlaActivos.Web.Services;
+using UdlaActivos.Web.Abstractions;
+using UdlaActivos.Web.Models;
 
 namespace UdlaActivos.Web.Controllers;
 
-public class AssetsController : Controller
+public class AssetsController(AssetsService svc) : Controller
 {
-    // MOCK: fuente en memoria (puedes moverla a un servicio luego)
-    private static readonly List<AssetViewModel> Data = new()
+    // Listado con filtros (q/state) y paginación
+    public async Task<IActionResult> Index(string? q, string? state = "Todos", int page = 1, int pageSize = 10)
     {
-        new("CPU-1001","Computadora","Dell Optiplex 7090","DLLXPS7090123","Ana María Ariza","UDLA Granados","Asignado"),
-        new("CPU-1002","Computadora","HP EliteDesk 800 G6","HPEDS800GG6456","Carlos Mendoza","UDLA Colón","Asignado"),
-        new("MON-2001","Monitor","Dell P2419H","DLLP2419H789","María González","UDLA Park","Asignado"),
-        new("IMP-3001","Impresora","HP LaserJet Pro M404dn","HPLJ404DN101","—","UDLA Granados","Disponible"),
-        new("CPU-1003","Computadora","Apple iMac 27\"","APLIMAC27202","Juan Pérez","UDLA Colón","Mantenimiento"),
-        new("MON-2002","Monitor","LG 27UK850-W","LG27UK850303","—","UDLA Granados","Disponible"),
-        new("TEC-4001","Teclado","Logitech K120","LGTK120404","Ana María Ariza","UDLA Granados","Asignado"),
-    };
+        ViewData["Title"] = "Activos";
 
-    public IActionResult Index(string? q, string? state = "Todos", int page = 1, int pageSize = 10)
-    {
-        // base query
-        IEnumerable<AssetViewModel> query = Data;
-
-        // filtro por estado
-        state = string.IsNullOrWhiteSpace(state) ? "Todos" : state;
-        if (state is "Asignados" or "Disponibles" or "En Mantenimiento")
-        {
-            var wanted = state == "En Mantenimiento" ? "Mantenimiento" : state.TrimEnd('s');
-            query = query.Where(a => a.Status.Equals(wanted, StringComparison.OrdinalIgnoreCase));
-        }
-
-        // filtro por texto
-        if (!string.IsNullOrWhiteSpace(q))
-        {
-            q = q.Trim();
-            query = query.Where(a =>
-                a.Code.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                a.Type.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                a.BrandModel.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                a.Serial.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                a.Responsible.Contains(q, StringComparison.OrdinalIgnoreCase) ||
-                a.Site.Contains(q, StringComparison.OrdinalIgnoreCase));
-        }
-
-        // orden y paginación
-        query = query.OrderBy(a => a.Code);
-        var total = query.Count();
-        var items = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        var result = await svc.GetAsync(q, state ?? "Todos", page, pageSize);
 
         var vm = new AssetsPageVm(
-            Items: items,
+            Items: result.Items.Select(a => new AssetViewModel(
+                Code: a.Code,
+                Type: a.Type,
+                BrandModel: a.BrandModel,
+                Serial: a.Serial,
+                Responsible: a.Responsible,
+                Site: a.Site,
+                Status: a.Status
+            )).ToList(),
             Query: q ?? "",
-            State: state!,
-            Page: page,
-            PageSize: pageSize,
-            Total: total
+            State: state ?? "Todos",
+            Page: result.Page,
+            PageSize: result.PageSize,
+            Total: result.Total
         );
 
-        ViewData["Title"] = "Activos";
-        return View(vm);
+        return View(vm); // usa Views/Assets/Index.cshtml que ya tienes
+    }
+
+    // GET: formulario "Nuevo Activo"
+    [HttpGet]
+    public IActionResult New()
+    {
+        ViewData["Title"] = "Nuevo Activo";
+        return View(new AssetCreateVm()); // Views/Assets/New.cshtml
+    }
+
+    // POST: crear (mock o API según config)
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> New(AssetCreateVm vm)
+    {
+        ViewData["Title"] = "Nuevo Activo";
+        if (!ModelState.IsValid) return View(vm);
+
+        // Mapeo VM -> DTO (contrato estable)
+        var dto = new AssetDto(
+            Code: vm.UdlaCode,
+            Type: vm.Type,
+            BrandModel: $"{vm.Brand} {vm.Model}".Trim(),
+            Serial: vm.Serial,
+            Responsible: "—",
+            Site: vm.Site,
+            Status: vm.Status
+        );
+
+        await svc.CreateAsync(dto);
+        TempData["Ok"] = "Activo creado correctamente.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(string code)
+    {
+        ViewData["Title"] = "Detalle de Activo";
+        var dto = await svc.GetDetailAsync(code);
+        if (dto is null) return NotFound();
+
+        // Map a VM de vista
+        var vm = new AssetDetailVm(
+            Code: dto.Code,
+            Title: dto.Title,
+            Type: dto.Type,
+            Brand: dto.Brand,
+            Model: dto.Model,
+            Serial: dto.Serial,
+            Status: dto.Status,
+            PurchaseDate: dto.PurchaseDate,
+            Description: dto.Description,
+            Notes: dto.Notes,
+            AssignedTo: dto.AssignedTo,
+            AssignedRole: dto.AssignedRole,
+            Site: dto.Site,
+            AssignedAt: dto.AssignedAt,
+            LastMaintenance: dto.LastMaintenance,
+            DeliveryDocUrl: dto.DeliveryDocUrl ?? "#",
+            History: dto.History.Select(h => new HistoryItemVm(h.Kind, h.Date, h.Title, h.By, h.Ref)).ToList()
+        );
+
+        return View(vm); // Views/Assets/Details.cshtml
     }
 }
-
-public record AssetViewModel(
-    string Code, string Type, string BrandModel, string Serial,
-    string Responsible, string Site, string Status
-);
-
-// ViewModel para la vista (lista + metadatos)
-public record AssetsPageVm(
-    List<AssetViewModel> Items,
-    string Query,
-    string State,
-    int Page,
-    int PageSize,
-    int Total
-);

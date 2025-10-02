@@ -1,13 +1,29 @@
-﻿@model UdlaActivos.Web.Controllers.AssetsPageVm
+﻿@model UdlaActivos.Web.Models.AssetsPageVm
 @{
     ViewData["Title"] = "Activos";
-    var httpReq = ViewContext.HttpContext.Request;
+
+    // Genera enlaces preservando q/state y moviéndote de página
     Func<string, int?, string> link = (state, goPage) =>
-        Url.Action("Index", new { state, q = Model.Query, page = goPage ?? 1, pageSize = Model.PageSize })!;
+        Url.Action("Index", new
+        {
+            state,
+            q = Model.Query,
+            page = goPage ?? 1,
+            pageSize = Model.PageSize
+        })!;
+
     int totalPages = Math.Max(1, (int)Math.Ceiling((double)Model.Total / Model.PageSize));
 }
 
+<!-- Fuente Inter -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
+
+
+
+    /* Segmented control */
     .segmented {
         display: inline-flex;
         gap: 0;
@@ -40,6 +56,206 @@
                 box-shadow: 0 1px 2px rgba(0,0,0,.04)
             }
 
+    /* Search input con icono interno */
+    .search-input {
+        background-color: #fff;
+        border: 1px solid #e6e8eb;
+        border-radius: 12px;
+        height: 42px;
+        padding-left: 38px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.03) inset;
+        background-repeat: no-repeat;
+        background-position: 12px 50%;
+        background-size: 18px 18px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa0a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+    }
+
+        .search-input::placeholder {
+            color: #9aa0a6
+        }
+
+        .search-input:focus {
+            outline: 0;
+            border-color: #cfd4d9;
+            box-shadow: 0 0 0 3px rgba(17,17,17,.06)
+        }
+
+    /* Card suave */
+    .card.border-0 {
+        border: 1px solid var(--card-border) !important;
+        border-radius: 14px;
+    }
+
+    /* Tabla con anchos fijos y look moderno */
+    .table-fixed {
+        table-layout: fixed;
+        width: 100%;
+        min-width: 1100px
+    }
+
+    .table-modern th,
+    .table-modern td {
+        text-align: initial;
+    }
+
+    .table-modern thead th {
+        text-align: initial;
+    }
+
+
+    .table-modern {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: .95rem;
+		border-radius: 10px;
+		border: 1px solid var(--row-border);
+    }
+
+        .table-modern thead th {
+            background: var(--thead-bg);
+            font-weight: 500;
+            color: hsl(240deg 3.76% 45.67%);
+            border-bottom: 1px solid var(--row-border) !important;
+            padding: 14px 16px !important;
+            vertical-align: middle;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+            .table-modern thead th:first-child {
+                border-top-left-radius: 10px;
+            }
+
+            .table-modern thead th:last-child {
+                border-top-right-radius: 10px;
+            }
+
+        .table-modern tbody td {
+            border-bottom: 1px solid var(--row-border) !important;
+            padding: 14px 16px !important;
+            vertical-align: middle;
+            font-weight:400;
+        }
+
+        .table-modern tbody tr {
+            height: 64px;
+        }
+
+            .table-modern tbody tr:hover {
+                background: var(--hover);
+            }
+
+    .col-code {
+        width: 120px
+    }
+
+    .col-type {
+        width: 140px
+    }
+
+    .col-brand {
+        width: 220px
+    }
+
+    .col-serial {
+        width: 170px
+    }
+
+    .col-resp {
+        width: 180px
+    }
+
+    .col-site {
+        width: 150px
+    }
+
+    .col-status {
+        width: 140px
+    }
+
+    .col-actions {
+        width: 110px
+    }
+
+    .truncate {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: bottom
+    }
+
+    .truncate-20 {
+        max-width: 20ch
+    }
+
+    .td-code {
+        font-weight: 600;
+        color: #111;
+    }
+
+    /* Badge redondeada oscura */
+    .badge.rounded-pill.text-bg-dark {
+        background-color: #1f2937 !important;
+        color: #fff !important;
+        padding: 6px 10px;
+        font-weight: 600;
+        border-radius: 9999px !important;
+        font-size: .78rem;
+    }
+
+    /* Botón minimal para ordenar en <th> */
+    .th-sort {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0; /* sin padding */
+        margin: 0;
+        border: 0; /* sin borde */
+        background: transparent; /* fondo transparente */
+        font-weight: 500;
+        color: hsl(240deg 3.76% 45.67%);
+        line-height: 1;
+        cursor: pointer;
+        appearance: none;
+    }
+
+        .th-sort:hover {
+            color: #111;
+        }
+
+        .th-sort:focus-visible {
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(17,17,17,.08);
+            border-radius: 6px;
+        }
+
+        /* Tamaño del icono */
+        .th-sort svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* (Opcional) estados visuales si aplicas orden asc/desc con clases */
+        .th-sort.is-asc .icon-desc,
+        .th-sort.is-desc .icon-asc {
+            opacity: .25;
+        }
+    /* atenúa la que no aplica */
+
+
+    /* Enlace de acción sin subrayado */
+    .action-link {
+        text-decoration: none !important;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+        .action-link:hover {
+            opacity: .8;
+        }
 </style>
 
 <div class="card border-0 shadow-sm">
@@ -48,17 +264,14 @@
         <!-- Búsqueda + Acciones -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <form class="d-flex gap-2" method="get" asp-action="Index">
-                <input type="search"
-                       class="form-control search-input"
-                       name="q"
-                       value="@Model.Query"
-                       placeholder="Buscar activos..."
-                       aria-label="Buscar activos" />
-
+                <input type="search" class="form-control search-input"
+                       name="q" value="@Model.Query" placeholder="Buscar activos..." aria-label="Buscar activos" />
+                <input type="hidden" name="state" value="@Model.State" />
+                <button class="btn btn-outline-secondary" type="submit" title="Buscar">🔍</button>
             </form>
             <div class="d-flex gap-2">
                 <a class="btn btn-outline-secondary" href="#">⭳ Exportar</a>
-                <a class="btn btn-dark" href="#">＋ Nuevo Activo</a>
+                <a class="btn btn-dark" asp-action="New">＋ Nuevo Activo</a>
             </div>
         </div>
 
@@ -74,11 +287,44 @@
 
         <!-- Tabla -->
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
-                <thead class="table-light">
+            <table class="table table-modern align-middle mb-0 table-fixed">
+                <colgroup>
+                    <col class="col-code" />
+                    <col class="col-type" />
+                    <col class="col-brand" />
+                    <col class="col-serial" />
+                    <col class="col-resp" />
+                    <col class="col-site" />
+                    <col class="col-status" />
+                    <col class="col-actions" />
+                </colgroup>
+
+                <thead>
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Tipo</th>
+                        <th scope="col">
+                            <button type="button" class="th-sort" aria-label="Ordenar por ID">
+                                <span>ID</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path class="icon-desc" d="m21 16-4 4-4-4"></path>
+                                    <path d="M17 20V4"></path>
+                                    <path class="icon-asc" d="m3 8 4-4 4 4"></path>
+                                    <path d="M7 4v16"></path>
+                                </svg>
+                            </button>
+                        </th>
+                        <th scope="col">
+                            <button type="button" class="th-sort" aria-label="Ordenar por Tipo">
+                                <span>Tipo</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path class="icon-desc" d="m21 16-4 4-4-4"></path>
+                                    <path d="M17 20V4"></path>
+                                    <path class="icon-asc" d="m3 8 4-4 4 4"></path>
+                                    <path d="M7 4v16"></path>
+                                </svg>
+                            </button>
+                        </th>
                         <th scope="col">Marca / Modelo</th>
                         <th scope="col">Serie</th>
                         <th scope="col">Responsable</th>
@@ -87,24 +333,28 @@
                         <th scope="col" class="text-end">Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @if (Model.Items.Count > 0)
                     {
                         foreach (var a in Model.Items)
                         {
                             <tr>
-                                <td class="fw-semibold">@a.Code</td>
-                                <td>@a.Type</td>
-                                <td>@a.BrandModel</td>
-                                <td>@a.Serial</td>
-                                <td>@a.Responsible</td>
-                                <td>@a.Site</td>
+                                <td class="td-code">@a.Code</td>
+                                <td><span class="truncate truncate-20" title="@a.Type">@a.Type</span></td>
+                                <td><span class="truncate truncate-20" title="@a.BrandModel">@a.BrandModel</span></td>
+                                <td><span class="truncate truncate-20" title="@a.Serial">@a.Serial</span></td>
+                                <td><span class="truncate truncate-20" title="@a.Responsible">@a.Responsible</span></td>
+                                <td><span class="truncate truncate-20" title="@a.Site">@a.Site</span></td>
                                 <td>
-                                    <span class="badge border rounded-pill">
+                                    <span class="badge rounded-pill text-bg-dark">
                                         @((a.Status == "Mantenimiento") ? "En mantenimiento" : a.Status)
                                     </span>
                                 </td>
-                                <td class="text-end"><a href="#" class="link-dark">Ver</a></td>
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-code="@a.Code" class="link-dark">Ver</a>
+
+                                </td>
                             </tr>
                         }
                     }
@@ -120,9 +370,7 @@
 
         <!-- Paginación simple -->
         <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="text-muted small">
-                Mostrando @Model.Items.Count de @Model.Total activos
-            </div>
+            <div class="text-muted small">Mostrando @Model.Items.Count de @Model.Total activos</div>
             <div class="btn-group">
                 <a class="btn btn-outline-secondary @(Model.Page <= 1 ? "disabled" : "")"
                    href="@(Model.Page <= 1 ? "#" : link(Model.State, Model.Page - 1))">Anterior</a>
